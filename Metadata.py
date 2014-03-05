@@ -82,3 +82,25 @@ def print_metadata(conn, imgid):
                 except AttributeError:
                     # this is not a laser
                     pass
+
+def get_metadict(conn, imgid):
+    image = conn.getObject('Image', imgid)
+    md_list = image.loadOriginalMetadata()[1]
+    return metadict_helios_nanolab(md_list)
+
+def metadict_helios_nanolab(md_list):
+    """Build a dict from a Helios NanoLab original metadata structure."""
+    md_dict = {}
+    for item in md_list:
+        # categories are written in square brackets:
+        if item[0].rfind(']') > 0:
+            category = item[0].split(']')[0][1:]
+            entry = item[0].split(']')[1].lstrip()
+        else:
+            category = 'generic'
+            entry = item[0]
+        if category not in md_dict:
+            md_dict[category] = {entry : item[1]}
+        else:
+            md_dict[category][entry] = item[1]
+    return md_dict
