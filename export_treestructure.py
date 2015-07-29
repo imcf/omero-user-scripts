@@ -46,14 +46,14 @@ def process_annotations(obj, directory):
     """Process all annotations of an object, downloading attachments."""
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
-            next
+            continue
         if obj.OMERO_CLASS == 'Dataset':
             tgt = os.path.join(directory, '_attachments')
         elif obj.OMERO_CLASS == 'Image':
             tgt = os.path.join(directory, obj.getName() + '_attachments')
         else:
             print "Unknown object type: %s" % obj.OMERO_CLASS
-            next
+            continue
         download_attachment(ann, tgt)
 
 
