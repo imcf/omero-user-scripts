@@ -44,8 +44,6 @@ def process_annotations(obj, directory):
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
             next
-        ann_name = ann.getFile().getName()
-        ann_id = ann.getFile().getId()
         if obj.OMERO_CLASS == 'Dataset':
             tgt = os.path.join(directory, '_attachments')
         elif obj.OMERO_CLASS == 'Image':
@@ -53,10 +51,25 @@ def process_annotations(obj, directory):
         else:
             print "Unknown object type: %s" % obj.OMERO_CLASS
             next
-        mkdir_verbose(tgt)
-        print tgt + '/' + ann_name, str(ann_id)
-        os.symlink(str(ann_id), tgt + '/' + ann_name)
-        print "ANNOTATION: (%s) %s" % (ann_id, ann_name)
+        download_attachment(ann, tgt)
+
+
+def download_attachment(ann, tgt):
+    """Download a file annotation."""
+    mkdir_verbose(tgt)
+    ann_name = ann.getFile().getName()
+    ann_id = ann.getFile().getId()
+    file_path = os.path.join(tgt + '/' + ann_name)
+    if os.path.exists(file_path):
+        print "Skipping existing attachment:", file_path
+        return
+    print file_path, " [%s]" % str(ann_id)
+    fout = open(str(file_path), 'w')
+    try:
+        for chunk in ann.getFileInChunks():
+            fout.write(chunk)
+    finally:
+        fout.close()
 
     
 
