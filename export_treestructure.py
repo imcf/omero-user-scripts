@@ -18,7 +18,8 @@ PORT = 4064
 USER = 'demo01'
 PASS = 'Dem0o1'
 
-BASE = '/tmp/foo234/tree'
+BASE = '/tmp/demo01/omero_hierarchy_tree'
+ATTACH = os.path.join(BASE, '_attachments')
 
 conn = BlitzGateway(USER, PASS, host=HOST, port=PORT)
 conn.connect()
@@ -54,29 +55,39 @@ def process_annotations(obj, directory):
         else:
             print "Unknown object type: %s" % obj.OMERO_CLASS
             continue
-        download_attachment(ann, tgt)
+        download_attachment(ann)
 
 
-def download_attachment(ann, tgt):
-    """Download a file annotation."""
-    mkdir_verbose(tgt)
-    ann_name = ann.getFile().getName()
+
+def download_attachment(ann):
+    """Download a file annotation to the attachment directory.
+
+    Downloading is done "lazy", meaning the file won't be re-downloaded if it
+    is already existing in the target directory.
+
+    Returns
+    -------
+    ann_id : long
+        The ID of the annotation (attachment).
+    """
     ann_id = ann.getFile().getId()
-    file_path = os.path.join(tgt + '/' + ann_name)
+    file_path = os.path.join(ATTACH, str(ann_id))
     if os.path.exists(file_path):
-        print "Skipping existing attachment:", file_path
-        return
-    print file_path, " [%s]" % str(ann_id)
+        print "Skipping existing attachment:", ann_id
+        return None
+    print file_path
     fout = open(str(file_path), 'w')
     try:
         for chunk in ann.getFileInChunks():
             fout.write(chunk)
     finally:
         fout.close()
+    return ann_id
 
     
 
 mkdir_verbose(BASE)
+mkdir_verbose(ATTACH)
 
 for proj in conn.listProjects():
     mkdir_verbose(os.path.join(BASE, proj.name))
