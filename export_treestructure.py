@@ -84,6 +84,6 @@ for proj in conn.listProjects():
         ds_dir = os.path.join(BASE, proj.name, ds.name)
         mkdir_verbose(ds_dir)
         process_annotations(ds, ds_dir)
-        for img in ds.listChildren():
-            link_origfiles(img, ds_dir)
-            process_annotations(img, ds_dir)
+        for image in ds.listChildren():
+            link_origfiles(image, ds_dir)
+            process_annotations(image, ds_dir)
