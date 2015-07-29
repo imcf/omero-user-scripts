@@ -43,6 +43,32 @@ def link_origfiles(img, directory):
         if not os.path.lexists(name):
             os.symlink(link_tgt, name)
 
+def link_attachment(ann, directory):
+    """Create a symlink to an attachment.
+
+    Parameters
+    ----------
+    ann : FileAnnotationWrapper
+    directory : str
+        The directory where the symlink should be placed
+    """
+    ### create the symlink TARGET string:
+    # (1) remove BASE, split dirs, remove suffix:
+    target = directory.replace(BASE, '').split('/')[:-1]
+    # (2) replace all entries with '..':
+    for i in range(len(target)):
+        target[i] = '..'
+    # (3) append the attachments directory and ID:
+    target.extend(['_attachments', str(ann.getFile().getId())])
+    # (4) turn it into a relative path string:
+    target = os.path.join(*target)
+    symlink = os.path.join(directory, ann.getFile().getName())
+    mkdir_verbose(directory)
+    print "LINK: %s -> %s" % (symlink, target)
+    if not os.path.lexists(symlink):
+        os.symlink(target, symlink)
+
+
 def process_annotations(obj, directory):
     """Process all annotations of an object, downloading attachments."""
     for ann in obj.listAnnotations():
@@ -56,6 +82,7 @@ def process_annotations(obj, directory):
             print "Unknown object type: %s" % obj.OMERO_CLASS
             continue
         download_attachment(ann)
+        link_attachment(ann, tgt)
 
 
 
