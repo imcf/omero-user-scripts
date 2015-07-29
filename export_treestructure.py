@@ -3,7 +3,6 @@
 import sys
 import argparse
 import os
-import hrm_config
 
 try:
     from omero.gateway import BlitzGateway, FileAnnotationWrapper
@@ -14,7 +13,7 @@ except ImportError:
     print
     sys.exit()
 
-HOST = hrm_config.CONFIG['OMERO_HOSTNAME']
+HOST = 'vbox.omero-512'
 PORT = 4064
 USER = 'demo01'
 PASS = 'Dem0o1'
