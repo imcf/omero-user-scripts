@@ -5,8 +5,14 @@ import argparse
 import os
 import hrm_config
 
-sys.path.insert(0, '%s/lib/python' % hrm_config.CONFIG['OMERO_PKG'])
-from omero.gateway import BlitzGateway, FileAnnotationWrapper
+try:
+    from omero.gateway import BlitzGateway, FileAnnotationWrapper
+except ImportError:
+    print "Adjust your PYTHONPATH to include the omero package, e.g.:"
+    print
+    print "export PYTHONPATH=/opt/OMERO/OMERO.server/lib/python:$PYTHONPATH"
+    print
+    sys.exit()
 
 HOST = hrm_config.CONFIG['OMERO_HOSTNAME']
 PORT = 4064
