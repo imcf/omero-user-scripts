@@ -18,8 +18,9 @@ PORT = 4064
 USER = 'demo01'
 PASS = 'Dem0o1'
 
-BASE = '/tmp/demo01/omero_hierarchy_tree'
-ATTACH = os.path.join(BASE, '_attachments')
+BASE = '/tmp/demo01/omero_hierarchy'
+TREE = os.path.join(BASE, 'tree')
+ATTACH = os.path.join(BASE, 'attachments')
 
 conn = BlitzGateway(USER, PASS, host=HOST, port=PORT)
 conn.connect()
@@ -60,7 +61,7 @@ def link_attachment(ann, directory):
     for i in range(len(target)):
         target[i] = '..'
     # (3) append the attachments directory and ID:
-    target.extend(['_attachments', str(ann.getFile().getId())])
+    target.extend(['attachments', str(ann.getFile().getId())])
     # (4) turn it into a relative path string:
     target = os.path.join(*target)
     symlink = os.path.join(directory, ann.getFile().getName())
@@ -114,13 +115,13 @@ def download_attachment(ann):
 
     
 
-mkdir_verbose(BASE)
+mkdir_verbose(TREE)
 mkdir_verbose(ATTACH)
 
 for proj in conn.listProjects():
-    mkdir_verbose(os.path.join(BASE, proj.name))
+    mkdir_verbose(os.path.join(TREE, proj.name))
     for ds in proj.listChildren():
-        ds_dir = os.path.join(BASE, proj.name, ds.name)
+        ds_dir = os.path.join(TREE, proj.name, ds.name)
         mkdir_verbose(ds_dir)
         process_annotations(ds, ds_dir)
         for image in ds.listChildren():
