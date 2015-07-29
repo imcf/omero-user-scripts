@@ -25,6 +25,7 @@ conn.connect()
 
 
 def mkdir_verbose(directory):
+    """Verbose mkdir, creating the directory only if it doesn't exist."""
     print directory
     if os.path.exists(directory):
         return
@@ -32,6 +33,7 @@ def mkdir_verbose(directory):
 
 
 def link_origfiles(img, directory):
+    """Create a symlink to the original file of an OMERO image."""
     for origfile in img.getImportedImageFiles():
         name = os.path.join(directory, origfile.getName())
         link_tgt = os.path.join(origfile.getPath(), origfile.getName())
@@ -41,6 +43,7 @@ def link_origfiles(img, directory):
             os.symlink(link_tgt, name)
 
 def process_annotations(obj, directory):
+    """Process all annotations of an object, downloading attachments."""
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
             next
