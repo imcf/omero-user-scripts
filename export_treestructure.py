@@ -43,6 +43,7 @@ def link_origfiles(img, directory):
         if not os.path.lexists(name):
             os.symlink(link_tgt, name)
 
+
 def link_attachment(ann, directory):
     """Create a symlink to an attachment.
 
@@ -74,7 +75,7 @@ def process_annotations(obj, directory):
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
             continue
-        if obj.OMERO_CLASS == 'Dataset':
+        if obj.OMERO_CLASS == 'Dataset' or obj.OMERO_CLASS == 'Project':
             tgt = os.path.join(directory, '_attachments')
         elif obj.OMERO_CLASS == 'Image':
             tgt = os.path.join(directory, obj.getName() + '_attachments')
