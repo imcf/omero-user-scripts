@@ -19,6 +19,12 @@ PASS = 'Dem0o1'
 
 MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
 
+try:
+    from localconfig import USER, PASS, MANAGED_REPO
+except ImportError:
+    print "Using hard-coded configuration values!"
+
+
 conn = BlitzGateway(USER, PASS, host=HOST, port=PORT)
 conn.connect()
 
