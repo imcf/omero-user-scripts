@@ -28,6 +28,11 @@ except ImportError:
 conn = BlitzGateway(USER, PASS, host=HOST, port=PORT)
 conn.connect()
 
+# TODO: switch to target user when connecting with an admin:
+# base_conn = BlitzGateway()
+# base_conn.connect()
+# conn = base_conn.suConn(username)
+
 UID = conn.getUserId()
 
 BASE = os.path.join(MANAGED_REPO, USER + '_' + str(UID), 'omero_hierarchy')
