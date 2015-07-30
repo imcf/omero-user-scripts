@@ -40,12 +40,18 @@ def mkdir_verbose(directory):
 def link_origfiles(img, directory):
     """Create a symlink to the original file of an OMERO image."""
     for origfile in img.getImportedImageFiles():
-        name = os.path.join(directory, origfile.getName())
-        link_tgt = os.path.join(origfile.getPath(), origfile.getName())
-        print "LINK: %s -> %s" % (name, link_tgt)
+        symlink = os.path.join(directory, origfile.getName())
+        target = os.path.join(MANAGED_REPO, origfile.getPath(), origfile.getName())
+        target = target.replace(MANAGED_REPO, '').split('/')[2:]
+        relpath = directory.replace(BASE, '').split('/')
+        for i in range(len(relpath)):
+            relpath[i] = '..'
+        target = relpath + target
+        target = os.path.join(*target)
+        print "LINK: %s -> %s" % (symlink, target)
         # TODO: replace lexists() by exists() once we're on real paths:
-        if not os.path.lexists(name):
-            os.symlink(link_tgt, name)
+        if not os.path.lexists(symlink):
+            os.symlink(target, symlink)
 
 
 def link_attachment(ann, directory):
