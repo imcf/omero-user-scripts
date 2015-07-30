@@ -12,17 +12,21 @@ except ImportError:
     print
     sys.exit()
 
-HOST = 'vbox.omero-512'
+HOST = 'localhost'
 PORT = 4064
 USER = 'demo01'
 PASS = 'Dem0o1'
 
-BASE = '/tmp/demo01/omero_hierarchy'
-TREE = os.path.join(BASE, 'tree')
-ATTACH = os.path.join(BASE, 'attachments')
+MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
 
 conn = BlitzGateway(USER, PASS, host=HOST, port=PORT)
 conn.connect()
+
+UID = conn.getUserId()
+
+BASE = os.path.join(MANAGED_REPO, USER + '_' + str(UID), 'omero_hierarchy')
+TREE = os.path.join(BASE, 'tree')
+ATTACH = os.path.join(BASE, 'attachments')
 
 
 def mkdir_verbose(directory):
