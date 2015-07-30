@@ -128,7 +128,9 @@ mkdir_verbose(TREE)
 mkdir_verbose(ATTACH)
 
 for proj in conn.listProjects():
+    proj_dir = os.path.join(TREE, proj.name)
     mkdir_verbose(os.path.join(TREE, proj.name))
+    process_annotations(proj, proj_dir)
     for ds in proj.listChildren():
         ds_dir = os.path.join(TREE, proj.name, ds.name)
         mkdir_verbose(ds_dir)
