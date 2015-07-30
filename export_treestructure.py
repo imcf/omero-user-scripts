@@ -40,8 +40,9 @@ def mkdir_verbose(directory):
 def link_origfiles(img, directory):
     """Create a symlink to the original file of an OMERO image."""
     for origfile in img.getImportedImageFiles():
-        symlink = os.path.join(directory, origfile.getName())
-        target = os.path.join(MANAGED_REPO, origfile.getPath(), origfile.getName())
+        fname = origfile.getName().replace('/', '_--_')
+        symlink = os.path.join(directory, fname)
+        target = os.path.join(MANAGED_REPO, origfile.getPath(), fname)
         target = target.replace(MANAGED_REPO, '').split('/')[2:]
         relpath = directory.replace(BASE, '').split('/')
         for i in range(len(relpath)):
@@ -73,7 +74,8 @@ def link_attachment(ann, directory):
     target.extend(['attachments', str(ann.getFile().getId())])
     # (4) turn it into a relative path string:
     target = os.path.join(*target)
-    symlink = os.path.join(directory, ann.getFile().getName())
+    fname = ann.getFile().getName().replace('/', '_--_')
+    symlink = os.path.join(directory, fname)
     mkdir_verbose(directory)
     print "LINK: %s -> %s" % (symlink, target)
     if not os.path.lexists(symlink):
@@ -88,7 +90,8 @@ def process_annotations(obj, directory):
         if obj.OMERO_CLASS == 'Dataset' or obj.OMERO_CLASS == 'Project':
             tgt = os.path.join(directory, '_attachments')
         elif obj.OMERO_CLASS == 'Image':
-            tgt = os.path.join(directory, obj.getName() + '_attachments')
+            name = obj.getName().replace('/', '_--_')
+            tgt = os.path.join(directory, name + '_attachments')
         else:
             print "Unknown object type: %s" % obj.OMERO_CLASS
             continue
