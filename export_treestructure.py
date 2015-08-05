@@ -50,10 +50,16 @@ def mkdir_verbose(directory):
 
 def link_origfiles(img, directory):
     """Create a symlink to the original file of an OMERO image."""
-    for origfile in img.getImportedImageFiles():
-        fname = origfile.getName().replace('/', '_--_')
+    # TODO: this doesn't work properly, should use ...FilePaths() instead:
+    # img.getImportedImageFilePaths()
+    #    {'client_paths': ['home/omero/images/bird.tif'],
+    #     'server_paths': ['demo01_34/2015-06/16/16-27-04.429/bird.tif']}
+
+    # for origfile in img.getImportedImageFiles():
+    for origfile in img.getImportedImageFilePaths()['server_paths']:
+        # fname = origfile.getName().replace('/', '_--_')
         symlink = os.path.join(directory, fname)
-        target = os.path.join(MANAGED_REPO, origfile.getPath(), fname)
+        target = os.path.join(MANAGED_REPO, origfile)
         target = target.replace(MANAGED_REPO, '').split('/')[2:]
         relpath = directory.replace(BASE, '').split('/')
         for i in range(len(relpath)):
