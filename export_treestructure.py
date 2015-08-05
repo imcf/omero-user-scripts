@@ -49,27 +49,38 @@ def mkdir_verbose(directory):
 
 
 def link_origfiles(img, directory):
-    """Create a symlink to the original file of an OMERO image."""
-    # TODO: this doesn't work properly, should use ...FilePaths() instead:
-    # img.getImportedImageFilePaths()
-    #    {'client_paths': ['home/omero/images/bird.tif'],
-    #     'server_paths': ['demo01_34/2015-06/16/16-27-04.429/bird.tif']}
+    """Create a symlink to the original file of an OMERO image.
 
-    # for origfile in img.getImportedImageFiles():
-    for origfile in img.getImportedImageFilePaths()['server_paths']:
-        # fname = origfile.getName().replace('/', '_--_')
-        symlink = os.path.join(directory, fname)
-        target = os.path.join(MANAGED_REPO, origfile)
-        target = target.replace(MANAGED_REPO, '').split('/')[2:]
-        relpath = directory.replace(BASE, '').split('/')
-        for i in range(len(relpath)):
-            relpath[i] = '..'
-        target = relpath + target
-        target = os.path.join(*target)
-        print "LINK: %s -> %s" % (symlink, target)
+    Parameters
+    ----------
+    img : omero.gateway._ImageWrapper
+    directory : str
+        The directory (full path) where the symlink should be placed.
+    """
+    origfiles = img.getImportedImageFilePaths()['server_paths']
+    fname = img.getName().replace('/', '_--_')
+    symlink = os.path.join(directory, fname)
+    relpath = ['..' for x in directory.replace(BASE, '').split('/')]
+    relpath = os.path.join(*relpath)
+    fcount = len(origfiles)
+    linkpairs = []
+    if fcount > 1:
+        fmt = '%0' + str(len(str(fcount))) + 'i'
+        for i, origfile in enumerate(origfiles):
+            target = origfile[origfile.index('/') + 1:]
+            target = os.path.join(relpath, target)
+            linkpairs.append((target, symlink + '_' + (fmt % i)))
+    else:
+        origfile = origfiles[0]
+        target = origfile[origfile.index('/') + 1:]
+        target = os.path.join(relpath, target)
+        linkpairs.append((target, symlink))
+    for pair in linkpairs:
+        print "LINK: %s -> %s" % (pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
-            os.symlink(target, symlink)
+            # os.symlink(target, symlink)
+            os.symlink(*pair)
 
 
 def link_attachment(ann, directory):
