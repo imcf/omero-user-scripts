@@ -48,9 +48,9 @@ ATTACH = os.path.join(BASE, 'attachments')
 
 def mkdir_verbose(directory):
     """Verbose mkdir, creating the directory only if it doesn't exist."""
-    print directory
     if os.path.exists(directory):
         return
+    print directory
     os.makedirs(directory)
 
 
