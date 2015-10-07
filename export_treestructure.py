@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 
 try:
     from omero.gateway import BlitzGateway, FileAnnotationWrapper
@@ -75,6 +76,22 @@ def link_origfiles(img, directory):
     fcount = len(origfiles)
     pairs = []
     if fcount > 1:
+        # workaround for the fileset problem: if the image name contains a
+        # square bracket, we assume this is the original image name and match
+        # it against the file names, using only those that DO contain the
+        # image's name (therefore exluding all "original" files that actually
+        # belong to another image of this fileset)
+        if "[" in fname:
+            tmplist = []
+            match = re.search(r"\[(\w+)\]", fname)
+            imgname = match.group(1)
+            # create a temporary (new) origfiles list
+            for origfile in origfiles:
+                if re.search(imgname, origfile):
+                    tmplist.append(origfile)
+            # now we replace the "origfiles" list:
+            origfiles = tmplist
+            fcount = len(origfiles)
         fmt = '%0' + str(len(str(fcount))) + 'i'
         for i, origfile in enumerate(origfiles):
             pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
