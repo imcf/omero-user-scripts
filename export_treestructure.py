@@ -63,25 +63,25 @@ def link_origfiles(img, directory):
     directory : str
         The directory (full path) where the symlink should be placed.
     """
+    relpath = ['..' for x in directory.replace(BASE, '').split('/')]
+    relpath = os.path.join(*relpath)
+    def tgt_name(origfile):
+        target = origfile[origfile.index('/') + 1:]
+        target = os.path.join(relpath, target)
+        return target
     origfiles = img.getImportedImageFilePaths()['server_paths']
     fname = img.getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
-    relpath = ['..' for x in directory.replace(BASE, '').split('/')]
-    relpath = os.path.join(*relpath)
     fcount = len(origfiles)
-    linkpairs = []
+    pairs = []
     if fcount > 1:
         fmt = '%0' + str(len(str(fcount))) + 'i'
         for i, origfile in enumerate(origfiles):
-            target = origfile[origfile.index('/') + 1:]
-            target = os.path.join(relpath, target)
-            linkpairs.append((target, symlink + '_' + (fmt % i)))
+            pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
     else:
         origfile = origfiles[0]
-        target = origfile[origfile.index('/') + 1:]
-        target = os.path.join(relpath, target)
-        linkpairs.append((target, symlink))
-    for pair in linkpairs:
+        pairs.append((tgt_name(origfile), symlink))
+    for pair in pairs:
         print "LINK: %s -> %s" % (pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
