@@ -21,7 +21,7 @@ SU_PASS = 'omero'
 MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
 
 try:
-    from localconfig import USER, PASS, SU_USER, SU_PASS, MANAGED_REPO
+    from localconfig import USER, SU_USER, SU_PASS, MANAGED_REPO
 except ImportError:
     print "Using hard-coded configuration values!"
 
