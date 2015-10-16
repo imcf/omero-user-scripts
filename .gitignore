@@ -1,5 +1,8 @@
 *.py[cod]
 
+# local file with auth settings, should not go into the repo:
+localconfig.py
+
 # C extensions
 *.so
 
