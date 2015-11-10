@@ -27,19 +27,6 @@ except ImportError:
     print "Using hard-coded configuration values!"
 
 
-su_conn = BlitzGateway(SU_USER, SU_PASS, host=HOST, port=PORT)
-if su_conn.connect() is False:
-    raise RuntimeError('Connection to OMERO failed, check settings!')
-
-conn = su_conn.suConn(USER)
-if conn.connect() is False:
-    raise RuntimeError('User switching in OMERO failed, check settings!')
-
-UID = conn.getUserId()
-
-BASE = os.path.join(MANAGED_REPO, USER + '_' + str(UID), 'omero_hierarchy')
-TREE = os.path.join(BASE, 'tree')
-ATTACH = os.path.join(BASE, 'attachments')
 
 
 def mkdir_verbose(directory):
@@ -145,7 +132,6 @@ def process_annotations(obj, directory):
         link_attachment(ann, tgt)
 
 
-
 def download_attachment(ann):
     """Download a file annotation to the attachment directory.
 
@@ -171,7 +157,33 @@ def download_attachment(ann):
         fout.close()
     return ann_id
 
-    
+
+def connect_as_user(username):
+    """Establish a connection to OMERO with a given user context.
+
+    To establish a connection as a specific user without knowing their
+    credential, a two-stage process is required: first the bsae connection is
+    created with an admin user, then this existing connection is switched over
+    to a (non-privileged) user account.
+
+    Returns the ID of the user corresponding to the connection.
+    """
+    # establish the base connection with an admin account
+    su_conn = BlitzGateway(SU_USER, SU_PASS, host=HOST, port=PORT)
+    if su_conn.connect() is False:
+        raise RuntimeError('Connection to OMERO failed, check settings!')
+    # now switch to the requested user
+    conn = su_conn.suConn(username)
+    if conn.connect() is False:
+        raise RuntimeError('User switching in OMERO failed, check settings!')
+    return conn.getUserId()
+
+
+UID = connect_as_user(USER)
+
+BASE = os.path.join(MANAGED_REPO, USER + '_' + str(UID), 'omero_hierarchy')
+TREE = os.path.join(BASE, 'tree')
+ATTACH = os.path.join(BASE, 'attachments')
 
 mkdir_verbose(TREE)
 mkdir_verbose(ATTACH)
