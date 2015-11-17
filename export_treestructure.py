@@ -95,7 +95,7 @@ def link_attachment(ann, directory):
     ----------
     ann : FileAnnotationWrapper
     directory : str
-        The directory where the symlink should be placed
+        The directory where the symlink should be placed.
     """
     ### create the symlink TARGET string:
     # (1) remove BASE, split dirs, remove suffix:
@@ -116,7 +116,15 @@ def link_attachment(ann, directory):
 
 
 def process_annotations(obj, directory):
-    """Process all annotations of an object, downloading attachments."""
+    """Process all annotations of an object, downloading attachments.
+
+    Parameters
+    ----------
+    obj : FIXME
+    directory : str
+        The directory where to place the symlinks to the attachments should be
+        placed.
+    """
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
             continue
