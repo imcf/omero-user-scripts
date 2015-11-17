@@ -1,7 +1,12 @@
 *.py[cod]
 
-# local file with auth settings, should not go into the repo:
+# local files with settings (auth, user names), should not go into the repo:
 localconfig.py
+localconfig_template.py
+userlist_for_tree_export.txt
+
+# vim swap files
+.*.sw?
 
 # C extensions
 *.so
