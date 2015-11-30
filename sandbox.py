@@ -12,7 +12,11 @@ except ImportError:
     print
     sys.exit()
 
+from omero.gateway import BlitzGateway, FileAnnotationWrapper
+
 HOST = 'localhost'
+HOST = 'omero.biozentrum.unibas.ch'
+
 PORT = 4064
 USER = 'demo01'
 # PASS = 'Dem0o1'
