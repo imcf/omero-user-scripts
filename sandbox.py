@@ -45,7 +45,8 @@ su_conn.connect()
 conn = su_conn.suConn(USER)
 conn.connect()
 
-projs = [ x for x in conn.listProjects() ]
+# projs = [ x for x in conn.listProjects() ]
+projs = [ x for x in conn.listProjects(eid=conn.getUserId()) ]
 proj = projs[0]
 print proj.getName()
 datasets = [x for x in proj.listChildren()]
