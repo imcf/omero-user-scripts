@@ -2,7 +2,7 @@
 
 # local files with settings (auth, user names), should not go into the repo:
 localconfig.py
-localconfig_template.py
+localconfig_*.py
 userlist_for_tree_export.txt
 
 # vim swap files
