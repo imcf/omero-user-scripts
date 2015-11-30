@@ -15,6 +15,8 @@ except ImportError:
 from omero.gateway import BlitzGateway, FileAnnotationWrapper
 
 HOST = 'localhost'
+HOST = 'vbox.omero-512'
+
 HOST = 'omero.biozentrum.unibas.ch'
 
 PORT = 4064
