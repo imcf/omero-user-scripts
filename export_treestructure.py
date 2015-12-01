@@ -80,6 +80,9 @@ def link_origfiles(img, directory, paths):
             # now we replace the "origfiles" list:
             origfiles = tmplist
             fcount = len(origfiles)
+        else:
+            print "WARNING: unexpected fileset name formatting: %s" % fname
+            return False
         fmt = '%0' + str(len(str(fcount))) + 'i'
         for i, origfile in enumerate(origfiles):
             pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
