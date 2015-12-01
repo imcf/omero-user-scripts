@@ -57,6 +57,7 @@ def link_origfiles(img, directory, paths):
         target = origfile[origfile.index('/') + 1:]
         target = os.path.join(relpath, target)
         return target
+    ### def filter_fileset(fname, origfiles): # TODO
     origfiles = img.getImportedImageFilePaths()['server_paths']
     fname = img.getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
