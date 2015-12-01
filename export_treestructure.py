@@ -49,6 +49,10 @@ def link_origfiles(img, directory, paths):
         The directory (full path) where the symlink should be placed.
     paths : dict
         The dict containing the base paths (ATTACH, BASE, TREE).
+
+    Returns
+    -------
+    True if the symlink creation was successful, False otherwise.
     """
     relpath = ['..' for _ in directory.replace(paths['BASE'], '').split('/')]
     relpath = os.path.join(*relpath)
@@ -98,6 +102,7 @@ def link_origfiles(img, directory, paths):
         if not os.path.lexists(symlink):
             # os.symlink(target, symlink)
             os.symlink(*pair)
+    return True
 
 
 def link_attachment(ann, directory, paths):
