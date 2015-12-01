@@ -1,5 +1,9 @@
 #!/bin/bash
 
+export PYTHONPATH=$PYTHONPATH:$HOME/OMERO.server/lib/python
+
+cd $(dirname $0)
+
 if [ -z "$1" ] ; then
     echo "ERROR: file with list of usernames required!"
     exit 1
@@ -26,5 +30,5 @@ for OMERO_USERNAME in $(cat "$USERLIST") ; do
     ./export_treestructure.py > "$LOGFILE" 2>&1
     TDELTA=$(echo "$(date +%s) - $TSTART" | bc -l)
     echo "Export of OMERO hierarchy took $TDELTA seconds."
-    rm -r "$OMERO_EXPORT/tree_old"
+    rm -rf "$OMERO_EXPORT/tree_old"
 done
