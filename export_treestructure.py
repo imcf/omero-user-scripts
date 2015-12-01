@@ -38,7 +38,7 @@ def mkdir_verbose(directory):
     """Verbose mkdir, creating the directory only if it doesn't exist."""
     if os.path.exists(directory):
         return
-    log.info(directory)
+    log.info("Creating directory: %s" % directory)
     os.makedirs(directory)
 
 
@@ -144,7 +144,7 @@ def link_attachment(ann, directory, paths):
     fname = ann.getFile().getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
     mkdir_verbose(directory)
-    print "LINK: %s -> %s" % (symlink, target)
+    log.info("LINK: %s -> %s" % (symlink, target))
     if not os.path.lexists(symlink):
         os.symlink(target, symlink)
 
@@ -169,7 +169,7 @@ def process_annotations(obj, directory, paths):
             name = obj.getName().replace('/', '_--_')
             tgt = os.path.join(directory, name + '_attachments')
         else:
-            print "Unknown object type: %s" % obj.OMERO_CLASS
+            log.error("Unknown object type: %s" % obj.OMERO_CLASS)
             continue
         download_attachment(ann, paths['ATTACH'])
         link_attachment(ann, tgt, paths)
@@ -195,9 +195,9 @@ def download_attachment(ann, ann_dir):
     ann_id = ann.getFile().getId()
     file_path = os.path.join(ann_dir, str(ann_id))
     if os.path.exists(file_path):
-        print "Skipping existing attachment:", ann_id
+        log.info("Skipping existing attachment: %s" % ann_id)
         return None
-    print file_path
+    log.info("Downloading attachment: %s" % file_path)
     fout = open(str(file_path), 'w')
     try:
         for chunk in ann.getFileInChunks():
@@ -225,6 +225,7 @@ def connect_as_user(username):
     conn = su_conn.suConn(username)
     if conn.connect() is False:
         raise RuntimeError('User switching in OMERO failed, check settings!')
+    log.debug("Successfully connected to OMERO.")
     return conn
 
 
@@ -232,6 +233,7 @@ def gen_treestructure(username):
     """Generate a tree structure with attachments and links to images."""
     conn = connect_as_user(username)
     uid = conn.getUserId()
+    log.info("Connection User ID: %s" % uid)
     paths = dict()
     paths['BASE'] = os.path.join(MANAGED_REPO,
                                  username + '_' + str(uid),
