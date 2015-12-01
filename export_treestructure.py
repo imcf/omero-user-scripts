@@ -75,7 +75,7 @@ def link_origfiles(img, directory, paths):
         # belong to another image of this fileset)
         if "[" in fname:
             tmplist = []
-            match = re.search(r"\[(\w+)\]", fname)
+            match = re.search(r"\[(.*)\]", fname)
             if match is None:
                 print "WARNING: filename matching failed: %s" % fname
                 return False
