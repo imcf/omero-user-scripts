@@ -39,7 +39,7 @@ def mkdir_verbose(directory):
     os.makedirs(directory)
 
 
-def link_origfiles(img, directory):
+def link_origfiles(img, directory, paths):
     """Create a symlink to the original file of an OMERO image.
 
     Parameters
@@ -47,8 +47,10 @@ def link_origfiles(img, directory):
     img : omero.gateway._ImageWrapper
     directory : str
         The directory (full path) where the symlink should be placed.
+    paths : dict
+        The dict containing the base paths (ATTACH, BASE, TREE).
     """
-    relpath = ['..' for x in directory.replace(BASE, '').split('/')]
+    relpath = ['..' for _ in directory.replace(paths['BASE'], '').split('/')]
     relpath = os.path.join(*relpath)
     def tgt_name(origfile):
         """Build the target name from the original file's name."""
@@ -91,7 +93,7 @@ def link_origfiles(img, directory):
             os.symlink(*pair)
 
 
-def link_attachment(ann, directory):
+def link_attachment(ann, directory, paths):
     """Create a symlink to an attachment.
 
     Parameters
@@ -99,10 +101,12 @@ def link_attachment(ann, directory):
     ann : FileAnnotationWrapper
     directory : str
         The directory where the symlink should be placed.
+    paths : dict
+        The dict containing the base paths (ATTACH, BASE, TREE).
     """
     ### create the symlink TARGET string:
     # (1) remove BASE, split dirs, remove suffix:
-    target = directory.replace(BASE, '').split('/')[:-1]
+    target = directory.replace(paths['BASE'], '').split('/')[:-1]
     # (2) replace all entries with '..':
     for i in range(len(target)):
         target[i] = '..'
@@ -118,7 +122,7 @@ def link_attachment(ann, directory):
         os.symlink(target, symlink)
 
 
-def process_annotations(obj, directory):
+def process_annotations(obj, directory, paths):
     """Process all annotations of an object, downloading attachments.
 
     Parameters
@@ -126,6 +130,8 @@ def process_annotations(obj, directory):
     obj : FIXME
     directory : str
         The directory where the symlinks to the attachments should be placed.
+    paths : dict
+        The dict containing the base paths (ATTACH, BASE, TREE).
     """
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
@@ -138,11 +144,11 @@ def process_annotations(obj, directory):
         else:
             print "Unknown object type: %s" % obj.OMERO_CLASS
             continue
-        download_attachment(ann)
-        link_attachment(ann, tgt)
+        download_attachment(ann, paths['ATTACH'])
+        link_attachment(ann, tgt, paths)
 
 
-def download_attachment(ann):
+def download_attachment(ann, ann_dir):
     """Download a file annotation to the attachment directory.
 
     Downloading is done "lazy", meaning the file won't be re-downloaded if it
@@ -151,6 +157,8 @@ def download_attachment(ann):
     Parameters
     ----------
     ann : OMERO annotation object (FIXME!)
+    ann_dir : str
+        The directory where the attachments will be placed in.
 
     Returns
     -------
@@ -158,7 +166,7 @@ def download_attachment(ann):
         The ID of the annotation (attachment).
     """
     ann_id = ann.getFile().getId()
-    file_path = os.path.join(ATTACH, str(ann_id))
+    file_path = os.path.join(ann_dir, str(ann_id))
     if os.path.exists(file_path):
         print "Skipping existing attachment:", ann_id
         return None
@@ -180,7 +188,7 @@ def connect_as_user(username):
     created with an admin user, then this existing connection is switched over
     to a (non-privileged) user account.
 
-    Returns the ID of the user corresponding to the connection.
+    Returns the connection in the user's context.
     """
     # establish the base connection with an admin account
     su_conn = BlitzGateway(SU_USER, SU_PASS, host=HOST, port=PORT)
@@ -190,26 +198,40 @@ def connect_as_user(username):
     conn = su_conn.suConn(username)
     if conn.connect() is False:
         raise RuntimeError('User switching in OMERO failed, check settings!')
-    return conn.getUserId()
+    return conn
 
 
-UID = connect_as_user(USER)
+def gen_treestructure(username):
+    """Generate a tree structure with attachments and links to images."""
+    conn = connect_as_user(username)
+    uid = conn.getUserId()
+    paths = dict()
+    paths['BASE'] = os.path.join(MANAGED_REPO,
+                                 username + '_' + str(uid),
+                                 'omero_hierarchy')
+    paths['TREE'] = os.path.join(paths['BASE'], 'tree')
+    paths['ATTACH'] = os.path.join(paths['BASE'], 'attachments')
 
-BASE = os.path.join(MANAGED_REPO, USER + '_' + str(UID), 'omero_hierarchy')
-TREE = os.path.join(BASE, 'tree')
-ATTACH = os.path.join(BASE, 'attachments')
+    mkdir_verbose(paths['TREE'])
+    mkdir_verbose(paths['ATTACH'])
+    # recursively build the tree:
+    for proj in conn.listProjects(eid=uid):
+        proj_dir = os.path.join(paths['TREE'], proj.name)
+        mkdir_verbose(os.path.join(paths['TREE'], proj.name))
+        process_annotations(proj, proj_dir, paths)
+        for dset in proj.listChildren():
+            dset_dir = os.path.join(paths['TREE'], proj.name, dset.name)
+            mkdir_verbose(dset_dir)
+            process_annotations(dset, dset_dir, paths)
+            for image in dset.listChildren():
+                link_origfiles(image, dset_dir, paths)
+                process_annotations(image, dset_dir, paths)
 
-mkdir_verbose(TREE)
-mkdir_verbose(ATTACH)
 
-for proj in conn.listProjects(eid=UID):
-    proj_dir = os.path.join(TREE, proj.name)
-    mkdir_verbose(os.path.join(TREE, proj.name))
-    process_annotations(proj, proj_dir)
-    for ds in proj.listChildren():
-        ds_dir = os.path.join(TREE, proj.name, ds.name)
-        mkdir_verbose(ds_dir)
-        process_annotations(ds, ds_dir)
-        for image in ds.listChildren():
-            link_origfiles(image, ds_dir)
-            process_annotations(image, ds_dir)
+def main():
+    """Run tree structure exporter."""
+    gen_treestructure(USER)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
