@@ -6,6 +6,10 @@ import sys
 import os
 import re
 
+import logging
+
+log = logging.getLogger('IMCF')
+
 try:
     from omero.gateway import BlitzGateway, FileAnnotationWrapper
 except ImportError:
@@ -26,8 +30,7 @@ MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
 try:
     from localconfig import USER, SU_USER, SU_PASS, MANAGED_REPO, HOST
 except ImportError:
-    print "Using hard-coded configuration values!"
-
+    log.warn("Using hard-coded configuration values!")
 
 
 
@@ -35,7 +38,7 @@ def mkdir_verbose(directory):
     """Verbose mkdir, creating the directory only if it doesn't exist."""
     if os.path.exists(directory):
         return
-    print directory
+    log.info(directory)
     os.makedirs(directory)
 
 
@@ -72,18 +75,20 @@ def link_origfiles(img, directory, paths):
         "original" files that actually belong to another image of this fileset)
         """
         if "[" not in fname:
-            print "WARNING: unexpected fileset name formatting: %s" % fname
+            log.warn("Unexpected fileset name formatting: %s" % fname)
             return None
         tmplist = []
         match = re.search(r"\[(.*)\]", fname)
         if match is None:
-            print "WARNING: filename matching failed: %s" % fname
+            log.warn("Filename matching failed: %s" % fname)
             return None
         # append a dot at the end to prevent "Pos1" matching "Pos10" etc.
         imgname = match.group(1) + "\."
+        log.debug("Matching pattern: '%s'" % imgname)
         # create a temporary (new) origfiles list
         for origfile in origfiles:
             if re.search(imgname, origfile):
+                log.debug("Matched filename: '%s'" % origfile)
                 tmplist.append(origfile)
         return tmplist
 
@@ -93,9 +98,11 @@ def link_origfiles(img, directory, paths):
     pairs = []
     if len(origfiles) > 1:
         # this is a fileset, so we have to treat the names specially:
+        log.debug("Found fileset: %s" % origfiles)
         origfiles = process_bracketed_names(fname, origfiles)
         if origfiles is None:
             return False
+        log.debug("Processed fileset: %s" % origfiles)
 
         # we need the length of the number of origfiles for the formatting:
         fmt = '%0' + str(len(str(len(origfiles)))) + 'i'
@@ -106,7 +113,7 @@ def link_origfiles(img, directory, paths):
         pairs = [(tgt_name(origfiles[0]), symlink)]
     # now we are ready to actually create the symlinks:
     for pair in pairs:
-        print "LINK: %s -> %s" % (pair[1], pair[0])
+        log.info("LINK: %s -> %s" % (pair[1], pair[0]))
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
             os.symlink(pair[0], pair[1])
@@ -283,6 +290,7 @@ def test():
 
 def main():
     """Run tree structure exporter."""
+    log.setLevel(10)
     gen_treestructure(USER)
 
 
