@@ -94,8 +94,7 @@ def link_origfiles(img, directory, paths):
         for i, origfile in enumerate(origfiles):
             pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
     else:
-        origfile = origfiles[0]
-        pairs.append((tgt_name(origfile), symlink))
+        pairs = [(tgt_name(origfiles[0]), symlink)]
     for pair in pairs:
         print "LINK: %s -> %s" % (pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
