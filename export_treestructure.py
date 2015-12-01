@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Generate a filesystem view resembling the hierarchy in OMERO."""
+
 import sys
 import os
 import re
@@ -49,6 +51,7 @@ def link_origfiles(img, directory):
     relpath = ['..' for x in directory.replace(BASE, '').split('/')]
     relpath = os.path.join(*relpath)
     def tgt_name(origfile):
+        """Build the target name from the original file's name."""
         target = origfile[origfile.index('/') + 1:]
         target = os.path.join(relpath, target)
         return target
@@ -122,8 +125,7 @@ def process_annotations(obj, directory):
     ----------
     obj : FIXME
     directory : str
-        The directory where to place the symlinks to the attachments should be
-        placed.
+        The directory where the symlinks to the attachments should be placed.
     """
     for ann in obj.listAnnotations():
         if not isinstance(ann, FileAnnotationWrapper):
@@ -145,6 +147,10 @@ def download_attachment(ann):
 
     Downloading is done "lazy", meaning the file won't be re-downloaded if it
     is already existing in the target directory.
+
+    Parameters
+    ----------
+    ann : OMERO annotation object (FIXME!)
 
     Returns
     -------
