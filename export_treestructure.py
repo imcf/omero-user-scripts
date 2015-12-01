@@ -65,9 +65,8 @@ def link_origfiles(img, directory, paths):
     origfiles = img.getImportedImageFilePaths()['server_paths']
     fname = img.getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
-    fcount = len(origfiles)
     pairs = []
-    if fcount > 1:
+    if len(origfiles) > 1:
         # workaround for the fileset problem: if the image name contains a
         # square bracket, we assume this is the original image name and match
         # it against the file names, using only those that DO contain the
@@ -86,11 +85,10 @@ def link_origfiles(img, directory, paths):
                     tmplist.append(origfile)
             # now we replace the "origfiles" list:
             origfiles = tmplist
-            fcount = len(origfiles)
         else:
             print "WARNING: unexpected fileset name formatting: %s" % fname
             return False
-        fmt = '%0' + str(len(str(fcount))) + 'i'
+        fmt = '%0' + str(len(str(len(origfiles)))) + 'i'
         for i, origfile in enumerate(origfiles):
             pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
     else:
