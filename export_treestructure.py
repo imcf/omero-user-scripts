@@ -72,6 +72,9 @@ def link_origfiles(img, directory, paths):
         if "[" in fname:
             tmplist = []
             match = re.search(r"\[(\w+)\]", fname)
+            if match is None:
+                print "WARNING: filename matching failed: %s" % fname
+                return False
             imgname = match.group(1)
             # create a temporary (new) origfiles list
             for origfile in origfiles:
