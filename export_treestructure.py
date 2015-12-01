@@ -77,7 +77,6 @@ def link_origfiles(img, directory, paths):
         if "[" not in fname:
             log.warn("Unexpected fileset name formatting: %s" % fname)
             return None
-        tmplist = []
         match = re.search(r"\[(.*)\]", fname)
         if match is None:
             log.warn("Filename matching failed: %s" % fname)
@@ -86,6 +85,7 @@ def link_origfiles(img, directory, paths):
         imgname = match.group(1) + "\."
         log.debug("Matching pattern: '%s'" % imgname)
         # create a temporary (new) origfiles list
+        tmplist = []
         for origfile in origfiles:
             if re.search(imgname, origfile):
                 log.debug("Matched filename: '%s'" % origfile)
