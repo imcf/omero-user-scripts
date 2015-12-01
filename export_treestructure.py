@@ -181,7 +181,7 @@ def download_attachment(ann):
 mkdir_verbose(TREE)
 mkdir_verbose(ATTACH)
 
-for proj in conn.listProjects():
+for proj in conn.listProjects(eid=UID):
     proj_dir = os.path.join(TREE, proj.name)
     mkdir_verbose(os.path.join(TREE, proj.name))
     process_annotations(proj, proj_dir)
