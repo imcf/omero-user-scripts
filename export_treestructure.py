@@ -228,6 +228,39 @@ def gen_treestructure(username):
                 process_annotations(image, dset_dir, paths)
 
 
+def test():
+    """Dummy function for testing purposes.
+
+    Example
+    =======
+    >>> import export_treestructure as et
+    >>> def run():
+    ...     reload(et)
+    ...     et.test()
+    >>> run()
+    """
+    conn = connect_as_user(USER)
+    uid = conn.getUserId()
+    paths = dict()
+    paths['BASE'] = os.path.join(MANAGED_REPO,
+                                 USER + '_' + str(uid),
+                                 'omero_hierarchy')
+    paths['TREE'] = os.path.join(paths['BASE'], 'tree')
+    paths['ATTACH'] = os.path.join(paths['BASE'], 'attachments')
+
+    mkdir_verbose(paths['TREE'])
+    mkdir_verbose(paths['ATTACH'])
+    proj = [x for x in conn.listProjects(eid=conn.getUserId())][1]
+    proj_dir = os.path.join(paths['TREE'], proj.name)
+    process_annotations(proj, proj_dir, paths)
+
+    ### # recursively build the tree:
+    ### for proj in conn.listProjects(eid=uid):
+    ###     proj_dir = os.path.join(paths['TREE'], proj.name)
+    ###     mkdir_verbose(os.path.join(paths['TREE'], proj.name))
+    ###     process_annotations(proj, proj_dir, paths)
+
+
 def main():
     """Run tree structure exporter."""
     gen_treestructure(USER)
