@@ -49,6 +49,9 @@ conn.connect()
 
 # projs = [ x for x in conn.listProjects() ]
 projs = [ x for x in conn.listProjects(eid=conn.getUserId()) ]
+for proj in projs:
+    print proj.getName()
+
 proj = projs[0]
 print proj.getName()
 datasets = [x for x in proj.listChildren()]
@@ -56,8 +59,9 @@ ds = datasets[0]
 print ds.getName()
 
 images = [ x for x in ds.listChildren() ]
+for img in images:
+    print img.getName()
 img = images[0]
-print img.getName()
 
 fileset = img.getFileset()
 print fileset
