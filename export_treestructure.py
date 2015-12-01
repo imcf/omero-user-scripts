@@ -88,11 +88,15 @@ def link_origfiles(img, directory, paths):
         else:
             print "WARNING: unexpected fileset name formatting: %s" % fname
             return False
+
+        # we need the length of the number of origfiles for the formatting:
         fmt = '%0' + str(len(str(len(origfiles)))) + 'i'
         for i, origfile in enumerate(origfiles):
             pairs.append((tgt_name(origfile), symlink + '_' + (fmt % i)))
     else:
+        # this is NOT a fileset, so simply proceed:
         pairs = [(tgt_name(origfiles[0]), symlink)]
+    # now we are ready to actually create the symlinks:
     for pair in pairs:
         print "LINK: %s -> %s" % (pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
