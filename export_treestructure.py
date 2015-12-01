@@ -56,37 +56,44 @@ def link_origfiles(img, directory, paths):
     """
     relpath = ['..' for _ in directory.replace(paths['BASE'], '').split('/')]
     relpath = os.path.join(*relpath)
+
     def tgt_name(origfile):
         """Build the target name from the original file's name."""
         target = origfile[origfile.index('/') + 1:]
         target = os.path.join(relpath, target)
         return target
-    ### def filter_fileset(fname, origfiles): # TODO
+
+    def process_bracketed_names(fname, origfiles):
+        """Workaround for the fileset naming problem.
+
+        If the image name contains a square bracket, we assume this is the
+        original image name and match it against the file names, using only
+        those that DO contain the image's name (therefore exluding all
+        "original" files that actually belong to another image of this fileset)
+        """
+        if "[" not in fname:
+            print "WARNING: unexpected fileset name formatting: %s" % fname
+            return None
+        tmplist = []
+        match = re.search(r"\[(.*)\]", fname)
+        if match is None:
+            print "WARNING: filename matching failed: %s" % fname
+            return None
+        imgname = match.group(1)
+        # create a temporary (new) origfiles list
+        for origfile in origfiles:
+            if re.search(imgname, origfile):
+                tmplist.append(origfile)
+        return tmplist
+
     origfiles = img.getImportedImageFilePaths()['server_paths']
     fname = img.getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
     pairs = []
     if len(origfiles) > 1:
-        # workaround for the fileset problem: if the image name contains a
-        # square bracket, we assume this is the original image name and match
-        # it against the file names, using only those that DO contain the
-        # image's name (therefore exluding all "original" files that actually
-        # belong to another image of this fileset)
-        if "[" in fname:
-            tmplist = []
-            match = re.search(r"\[(.*)\]", fname)
-            if match is None:
-                print "WARNING: filename matching failed: %s" % fname
-                return False
-            imgname = match.group(1)
-            # create a temporary (new) origfiles list
-            for origfile in origfiles:
-                if re.search(imgname, origfile):
-                    tmplist.append(origfile)
-            # now we replace the "origfiles" list:
-            origfiles = tmplist
-        else:
-            print "WARNING: unexpected fileset name formatting: %s" % fname
+        # this is a fileset, so we have to treat the names specially:
+        origfiles = process_bracketed_names(fname, origfiles)
+        if origfiles is None:
             return False
 
         # we need the length of the number of origfiles for the formatting:
