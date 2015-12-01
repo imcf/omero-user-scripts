@@ -79,7 +79,8 @@ def link_origfiles(img, directory, paths):
         if match is None:
             print "WARNING: filename matching failed: %s" % fname
             return None
-        imgname = match.group(1)
+        # append a dot at the end to prevent "Pos1" matching "Pos10" etc.
+        imgname = match.group(1) + "\."
         # create a temporary (new) origfiles list
         for origfile in origfiles:
             if re.search(imgname, origfile):
