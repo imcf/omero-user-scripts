@@ -55,7 +55,7 @@ def link_origfiles(img, directory, paths):
     True if the symlink creation was successful, False otherwise.
     """
     relpath = ['..' for _ in directory.replace(paths['BASE'], '').split('/')]
-    relpath = os.path.join(*relpath)
+    relpath = os.path.join(*relpath)  # pylint: disable=star-args
 
     def tgt_name(origfile):
         """Build the target name from the original file's name."""
@@ -108,8 +108,7 @@ def link_origfiles(img, directory, paths):
         print "LINK: %s -> %s" % (pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
-            # os.symlink(target, symlink)
-            os.symlink(*pair)
+            os.symlink(pair[0], pair[1])
     return True
 
 
@@ -133,7 +132,7 @@ def link_attachment(ann, directory, paths):
     # (3) append the attachments directory and ID:
     target.extend(['attachments', str(ann.getFile().getId())])
     # (4) turn it into a relative path string:
-    target = os.path.join(*target)
+    target = os.path.join(*target)  # pylint: disable=star-args
     fname = ann.getFile().getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
     mkdir_verbose(directory)
