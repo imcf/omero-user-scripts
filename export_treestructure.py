@@ -82,7 +82,7 @@ def link_origfiles(img, directory, paths):
             log.warn("Filename matching failed: %s" % fname)
             return None
         # append a dot at the end to prevent "Pos1" matching "Pos10" etc.
-        imgname = match.group(1) + "\."
+        imgname = match.group(1) + r"\."
         log.debug("Matching pattern: '%s'" % imgname)
         # create a temporary (new) origfiles list
         tmplist = []
