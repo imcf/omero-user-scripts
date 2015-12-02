@@ -38,7 +38,7 @@ def mkdir_verbose(directory):
     """Verbose mkdir, creating the directory only if it doesn't exist."""
     if os.path.exists(directory):
         return
-    log.info("Creating directory: %s" % directory)
+    log.info("Creating directory: %s", directory)
     os.makedirs(directory)
 
 
@@ -75,20 +75,20 @@ def link_origfiles(img, directory, paths):
         "original" files that actually belong to another image of this fileset)
         """
         if "[" not in fname:
-            log.warn("Unexpected fileset name formatting: %s" % fname)
+            log.warn("Unexpected fileset name formatting: %s", fname)
             return None
         match = re.search(r"\[(.*)\]", fname)
         if match is None:
-            log.warn("Filename matching failed: %s" % fname)
+            log.warn("Filename matching failed: %s", fname)
             return None
         # append a dot at the end to prevent "Pos1" matching "Pos10" etc.
         imgname = match.group(1) + r"\."
-        log.debug("Matching pattern: '%s'" % imgname)
+        log.debug("Matching pattern: '%s'", imgname)
         # create a temporary (new) origfiles list
         tmplist = []
         for origfile in origfiles:
             if re.search(imgname, origfile):
-                log.debug("Matched filename: '%s'" % origfile)
+                log.debug("Matched filename: '%s'", origfile)
                 tmplist.append(origfile)
         return tmplist
 
@@ -98,11 +98,11 @@ def link_origfiles(img, directory, paths):
     pairs = []
     if len(origfiles) > 1:
         # this is a fileset, so we have to treat the names specially:
-        log.debug("Found fileset: %s" % origfiles)
+        log.debug("Found fileset: %s", origfiles)
         origfiles = process_bracketed_names(fname, origfiles)
         if origfiles is None:
             return False
-        log.debug("Processed fileset: %s" % origfiles)
+        log.debug("Processed fileset: %s", origfiles)
 
         # we need the length of the number of origfiles for the formatting:
         fmt = '%0' + str(len(str(len(origfiles)))) + 'i'
@@ -113,7 +113,7 @@ def link_origfiles(img, directory, paths):
         pairs = [(tgt_name(origfiles[0]), symlink)]
     # now we are ready to actually create the symlinks:
     for pair in pairs:
-        log.info("LINK: %s -> %s" % (pair[1], pair[0]))
+        log.info("LINK: %s -> %s", pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
             os.symlink(pair[0], pair[1])
@@ -144,7 +144,7 @@ def link_attachment(ann, directory, paths):
     fname = ann.getFile().getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
     mkdir_verbose(directory)
-    log.info("LINK: %s -> %s" % (symlink, target))
+    log.info("LINK: %s -> %s", symlink, target)
     if not os.path.lexists(symlink):
         os.symlink(target, symlink)
 
@@ -169,7 +169,7 @@ def process_annotations(obj, directory, paths):
             name = obj.getName().replace('/', '_--_')
             tgt = os.path.join(directory, name + '_attachments')
         else:
-            log.error("Unknown object type: %s" % obj.OMERO_CLASS)
+            log.error("Unknown object type: %s", obj.OMERO_CLASS)
             continue
         download_attachment(ann, paths['ATTACH'])
         link_attachment(ann, tgt, paths)
@@ -195,9 +195,9 @@ def download_attachment(ann, ann_dir):
     ann_id = ann.getFile().getId()
     file_path = os.path.join(ann_dir, str(ann_id))
     if os.path.exists(file_path):
-        log.info("Skipping existing attachment: %s" % ann_id)
+        log.info("Skipping existing attachment: %s", ann_id)
         return None
-    log.info("Downloading attachment: %s" % file_path)
+    log.info("Downloading attachment: %s", file_path)
     fout = open(str(file_path), 'w')
     try:
         for chunk in ann.getFileInChunks():
@@ -233,7 +233,7 @@ def gen_treestructure(username):
     """Generate a tree structure with attachments and links to images."""
     conn = connect_as_user(username)
     uid = conn.getUserId()
-    log.info("Connection User ID: %s" % uid)
+    log.info("Connection User ID: %s", uid)
     paths = dict()
     paths['BASE'] = os.path.join(MANAGED_REPO,
                                  username + '_' + str(uid),
