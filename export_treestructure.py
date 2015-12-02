@@ -302,12 +302,6 @@ def test():
     proj_dir = os.path.join(paths['TREE'], proj.name)
     process_annotations(proj, proj_dir, paths)
 
-    ### # recursively build the tree:
-    ### for proj in conn.listProjects(eid=uid):
-    ###     proj_dir = os.path.join(paths['TREE'], proj.name)
-    ###     mkdir_verbose(os.path.join(paths['TREE'], proj.name))
-    ###     process_annotations(proj, proj_dir, paths)
-
 
 def main():
     """Run tree structure exporter."""
