@@ -42,7 +42,7 @@ def parse_arguments():
         help='The OMERO server IP or DNS name (default=localhost).')
     add('--port', type=int, default=4064,
         help='The OMERO server port (default=4064).')
-    add('--user', type=str,
+    add('--user', type=str, required=True,
         help='The OMERO user name.')
     add('-v', '--verbosity', dest='verbosity',
         action='count', default=0)
@@ -305,8 +305,10 @@ def test():
 
 def main():
     """Run tree structure exporter."""
-    log.setLevel(10)
-    gen_treestructure(USER)
+    args = parse_arguments()
+    log.setLevel((3 - args.verbosity) * 10)
+    for user in args.user.split(","):
+        gen_treestructure(user)
 
 
 if __name__ == "__main__":
