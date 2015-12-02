@@ -5,6 +5,7 @@
 import sys
 import os
 import re
+import argparse
 
 import logging
 
@@ -32,6 +33,24 @@ try:
 except ImportError:
     log.warn("Using hard-coded configuration values!")
 
+
+def parse_arguments():
+    """Parse commandline arguments."""
+    argparser = argparse.ArgumentParser(description=__doc__)
+    add = argparser.add_argument
+    add('--host', type=str,
+        help='The OMERO server IP or DNS name (default=localhost).')
+    add('--port', type=int, default=4064,
+        help='The OMERO server port (default=4064).')
+    add('--user', type=str,
+        help='The OMERO user name.')
+    add('-v', '--verbosity', dest='verbosity',
+        action='count', default=0)
+    try:
+        args = argparser.parse_args()
+    except IOError as err:
+        argparser.error(str(err))
+    return args
 
 
 def mkdir_verbose(directory):
