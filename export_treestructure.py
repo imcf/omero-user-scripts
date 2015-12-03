@@ -1,6 +1,47 @@
 #!/usr/bin/env python
 
-"""Generate a filesystem view resembling the hierarchy in OMERO."""
+"""Generate a filesystem view resembling the hierarchy in OMERO.
+
+The purpose of this script is to generate a tree-like structure inside a user's
+sub-directory in OMERO's managed repository that resembles the view seen by a
+user when connecting via OMERO.insight or using the webclient to give a more
+intuitive access to the original files from the filesystem perspective.
+
+With this tree-export, users can traverse the same (or at least similar)
+structure on the file system than in OMERO without actually having to query
+OMERO itself for projects, datasets, images and attachments.
+
+The structure is created as follows:
+
+/omero-managed-repository/username/
+    \_ omero_hierarchy
+       |_ attachments
+       \_ tree
+
+The "attachments" directory will be used to download all attachments, storing
+them in separate files using their OMERO id as the filename. This is required,
+as OMERO stores attachments in a central place, which is NOT user specific (and
+therefore can't be made accessible to the users without compromising the other
+user's attachments.
+
+The "tree" part will be pouplated with subdirectories, one per project, using
+the project's name (WARNING: duplicate project names are possible in OMERO, but
+will not be treated specially, meaning stuff from two independent projects that
+happen to have the same name will end up in the same project directory!).
+
+Each project directory contains sub-directories with the corresponding
+datasets, with the same restrictions as above. The dataset directories will be
+populated with symlinks to the original files. As the tree-structure is a
+sub-directory inside a user's part of the managed repository, relative symlinks
+are used for the image files, allowing fast and easy access to the original
+files.
+
+Attachments are allowed on any level of the hierarchy inside OMERO. For the
+folder-like objects (Projects and Datasets), a separate sub-directory called
+"_attachments" is created *inside* the corresponding folder, containing
+symlinks to the downloaded attachment file (see above). For images, an extra
+directory with the image's name followed by "_attachments" is used.
+"""
 
 import sys
 import os
@@ -36,7 +77,10 @@ except ImportError:
 
 def parse_arguments():
     """Parse commandline arguments."""
-    argparser = argparse.ArgumentParser(description=__doc__)
+    argparser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     add = argparser.add_argument
     add('--host', type=str,
         help='The OMERO server IP or DNS name (default=localhost).')
