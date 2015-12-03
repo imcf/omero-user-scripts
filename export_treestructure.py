@@ -43,7 +43,7 @@ def parse_arguments():
     add('--port', type=int, default=4064,
         help='The OMERO server port (default=4064).')
     add('--user', type=str, required=True,
-        help='The OMERO user name.')
+        help='The OMERO user name, multiple users separated by commas.')
     add('-v', '--verbosity', dest='verbosity',
         action='count', default=0)
     try:
