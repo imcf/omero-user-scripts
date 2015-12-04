@@ -14,9 +14,9 @@ OMERO itself for projects, datasets, images and attachments.
 The structure is created as follows:
 
 /omero-managed-repository/username/
-    \_ omero_hierarchy
-       |_ attachments
-       \_ tree
+    |__ omero_hierarchy
+         |__ attachments
+         |__ tree
 
 The "attachments" directory will be used to download all attachments, storing
 them in separate files using their OMERO id as the filename. This is required,
