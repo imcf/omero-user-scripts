@@ -75,28 +75,6 @@ except ImportError:
     log.warn("Using hard-coded configuration values!")
 
 
-def parse_arguments():
-    """Parse commandline arguments."""
-    argparser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    add = argparser.add_argument
-    add('--host', type=str,
-        help='The OMERO server IP or DNS name (default=localhost).')
-    add('--port', type=int, default=4064,
-        help='The OMERO server port (default=4064).')
-    add('--user', type=str, required=True,
-        help='The OMERO user name, multiple users separated by commas.')
-    add('-v', '--verbosity', dest='verbosity',
-        action='count', default=0)
-    try:
-        args = argparser.parse_args()
-    except IOError as err:
-        argparser.error(str(err))
-    return args
-
-
 def mkdir_verbose(directory):
     """Verbose mkdir, creating the directory only if it doesn't exist."""
     if os.path.exists(directory):
@@ -345,6 +323,28 @@ def test():
     proj = [x for x in conn.listProjects(eid=conn.getUserId())][1]
     proj_dir = os.path.join(paths['TREE'], proj.name)
     process_annotations(proj, proj_dir, paths)
+
+
+def parse_arguments():
+    """Parse commandline arguments."""
+    argparser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    add = argparser.add_argument
+    add('--host', type=str,
+        help='The OMERO server IP or DNS name (default=localhost).')
+    add('--port', type=int, default=4064,
+        help='The OMERO server port (default=4064).')
+    add('--user', type=str, required=True,
+        help='The OMERO user name, multiple users separated by commas.')
+    add('-v', '--verbosity', dest='verbosity',
+        action='count', default=0)
+    try:
+        args = argparser.parse_args()
+    except IOError as err:
+        argparser.error(str(err))
+    return args
 
 
 def main():
