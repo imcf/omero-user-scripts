@@ -63,14 +63,13 @@ except ImportError:
 
 HOST = 'localhost'
 PORT = 4064
-USER = 'demo01'
 SU_USER = 'root'
 SU_PASS = 'omero'
 
 MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
 
 try:
-    from localconfig import USER, SU_USER, SU_PASS, MANAGED_REPO, HOST
+    from localconfig import SU_USER, SU_PASS, MANAGED_REPO, HOST
 except ImportError:
     log.warn("Using hard-coded configuration values!")
 
@@ -298,7 +297,7 @@ def gen_treestructure(username):
                 process_annotations(image, dset_dir, paths)
 
 
-def test():
+def test(username):
     """Dummy function for testing purposes.
 
     Example
@@ -309,11 +308,11 @@ def test():
     ...     et.test()
     >>> run()
     """
-    conn = connect_as_user(USER)
+    conn = connect_as_user(username)
     uid = conn.getUserId()
     paths = dict()
     paths['BASE'] = os.path.join(MANAGED_REPO,
-                                 USER + '_' + str(uid),
+                                 username + '_' + str(uid),
                                  'omero_hierarchy')
     paths['TREE'] = os.path.join(paths['BASE'], 'tree')
     paths['ATTACH'] = os.path.join(paths['BASE'], 'attachments')
