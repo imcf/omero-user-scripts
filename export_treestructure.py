@@ -153,7 +153,7 @@ def link_origfiles(img, directory, paths):
         pairs = [(tgt_name(origfiles[0]), symlink)]
     # now we are ready to actually create the symlinks:
     for pair in pairs:
-        log.info("LINK: %s -> %s", pair[1], pair[0])
+        log.info("link_origfiles: %s -> %s", pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
         if not os.path.lexists(symlink):
             os.symlink(pair[0], pair[1])
@@ -184,7 +184,7 @@ def link_attachment(ann, directory, paths):
     fname = ann.getFile().getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
     mkdir_verbose(directory)
-    log.info("LINK: %s -> %s", symlink, target)
+    log.info("link_attachment: %s -> %s", symlink, target)
     if not os.path.lexists(symlink):
         os.symlink(target, symlink)
 
