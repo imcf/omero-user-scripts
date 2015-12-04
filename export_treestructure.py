@@ -61,17 +61,22 @@ except ImportError:
     print
     sys.exit()
 
-HOST = 'localhost'
-PORT = 4064
-SU_USER = 'root'
-SU_PASS = 'omero'
-
-MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
-
 try:
-    from localconfig import SU_USER, SU_PASS, MANAGED_REPO, HOST
+    from localconfig import SU_USER, SU_PASS, MANAGED_REPO, HOST, PORT
 except ImportError:
-    log.warn("Using hard-coded configuration values!")
+    log.error("""Could not find "localconfig.py"!
+
+    Use this template to create one:
+    -------------------------------------------------------
+    HOST = 'localhost'
+    PORT = 4064
+    SU_USER = 'root'
+    SU_PASS = 'omero'
+
+    MANAGED_REPO = '/home/omero/OMERO.data/ManagedRepository'
+    -------------------------------------------------------
+    """)
+    raise ImportError
 
 
 def mkdir_verbose(directory):
