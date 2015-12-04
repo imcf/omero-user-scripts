@@ -135,6 +135,7 @@ def link_origfiles(img, directory, paths):
     origfiles = img.getImportedImageFilePaths()['server_paths']
     fname = img.getName().replace('/', '_--_')
     symlink = os.path.join(directory, fname)
+    # pairs is a list of tuples of the form (target_file, symlink_file)
     pairs = []
     if len(origfiles) > 1:
         # this is a fileset, so we have to treat the names specially:
@@ -154,7 +155,8 @@ def link_origfiles(img, directory, paths):
     # now we are ready to actually create the symlinks:
     for pair in pairs:
         log.info("link_origfiles: %s -> %s", pair[1], pair[0])
-        # TODO: replace lexists() by exists() once we're on real paths:
+        # NOTE: lexists() returns True for broken symbolic links, whereas
+        # exists() would return false!
         if not os.path.lexists(pair[1]):
             os.symlink(pair[0], pair[1])
     return True
