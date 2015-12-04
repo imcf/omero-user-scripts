@@ -155,7 +155,7 @@ def link_origfiles(img, directory, paths):
     for pair in pairs:
         log.info("link_origfiles: %s -> %s", pair[1], pair[0])
         # TODO: replace lexists() by exists() once we're on real paths:
-        if not os.path.lexists(symlink):
+        if not os.path.lexists(pair[1]):
             os.symlink(pair[0], pair[1])
     return True
 
