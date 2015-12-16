@@ -35,8 +35,7 @@ TSTART=$(date +%s)
 LOGFILE="$LOGDIR/export_treestructure-$TSTART.log"
 echo
 echo "Starting export of OMERO hierarchy, logging to '$LOGFILE'."
-# ./export_treestructure.py --user $USERS -vv 2>&1 | tee log
-./export_treestructure.py --user $USERS -vv > "$LOGFILE" 2>&1
+./export_treestructure.py --user $USERS -v > "$LOGFILE" 2>&1
 TDELTA=$(echo "$(date +%s) - $TSTART" | bc -l)
 echo "Export of OMERO hierarchy took $TDELTA seconds."
 echo
