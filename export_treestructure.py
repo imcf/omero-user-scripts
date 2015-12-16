@@ -162,7 +162,9 @@ def link_origfiles(img, directory, paths):
         log.info("link_origfiles: %s -> %s", pair[1], pair[0])
         # NOTE: lexists() returns True for broken symbolic links, whereas
         # exists() would return false!
-        if not os.path.lexists(pair[1]):
+        if os.path.lexists(pair[1]):
+            log.warn("link_origfiles: symlink already exists: %s", pair[1])
+        else:
             os.symlink(pair[0], pair[1])
     return True
 
