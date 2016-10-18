@@ -1,0 +1,21 @@
+import omero, omero.scripts as scripts
+from omero.gateway import BlitzGateway
+
+import os
+
+# Define the script name & description
+client = scripts.client("Sand_Box.py", "Determine the user name of the session.")
+
+# Use the Python Blitz Gateway for convenience
+conn = BlitzGateway(client_obj=client)
+
+username = conn.getUser().getName()
+filename = os.path.join(os.environ['HOME'], '.omero_tree_export_usernames')
+
+print "%s -> %s" % (username, filename)
+
+with open(filename, 'a') as out:
+    out.write(',%s' % username)
+
+# Cleanup
+client.closeSession()

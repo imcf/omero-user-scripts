@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#
+# Copyright (C) 2014 IMCF, University of Basel, Switzerland.
+# All rights reserved.
+
+"""Describe your script here."""
+
+import omero
+
+from omero.gateway import BlitzGateway
+from omero.rtypes import *
+
+import omero.scripts as scripts
+# from numpy import *
+
+if __name__ == "__main__":
+
+    client = scripts.client(
+        'Example.py', """This script ...""",
+        scripts.Int(
+            "imageId", optional=False, grouping="2",
+            description="Image ID to process."),
+
+        version="0.1",
+        authors=["Niko Ehrenfeuchter"],
+        institutions=["IMCF, Uni Basel"],
+        contact="nikolaus.ehrenfeuchter@unibas.ch",
+    )
+
+    try:
+        conn = BlitzGateway(client_obj=client)
+
+        # Do work here including calling functions
+        # defined above.
+
+        # process the list of args above.
+        scriptParams = {}
+        for key in client.getInputKeys():
+            if client.getInput(key):
+                scriptParams[key] = unwrap(client.getInput(key))
+        print scriptParams
+
+
+        client.setOutput("Message", rstring("Success"))
+
+        image = conn.getObject("Image", scriptParams['imageId'])
+        print image.getName()
+        for i, ch in enumerate(image.getChannels()):
+            ch_label = ch.getLabel()
+            print ch_label
+            client.setOutput("Channel %s" % i, wrap(str(ch.getLabel())))
+
+    finally:
+        client.closeSession()
